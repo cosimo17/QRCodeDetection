@@ -53,24 +53,18 @@ def tf_create_yolo_label(bbox, grids, anchor_ratios, class_number):
     return label
 
 
-def tf_dataset(root_dir, grids, anchor_ratios, class_number):
+def create_dataset(root_dir, grids, anchor_ratios, class_number, batch_size):
     """
-    Build training dataset pipeline
+    Build dataset pipeline
     """
-    list_ds = tf.data.Dataset.list_files(root_dir + '/*.jpg')
-    imgs_ds = list_ds.map(tf_preprocess_img)
-    list_ds = tf.data.Dataset.list_files(root_dir + '/*.txt')
-    label_ds = list_ds.map(tf_preprocess_label)
+    list_ds = tf.data.Dataset.list_files(root_dir + '/*.jpg', shuffle=False)
+    imgs_ds = list_ds.map(tf_preprocess_img, num_parallel_calls=4)
+    list_ds = tf.data.Dataset.list_files(root_dir + '/*.txt', shuffle=False)
+    label_ds = list_ds.map(tf_preprocess_label, num_parallel_calls=4)
     label_ds = label_ds.map(
-        partial(tf_create_yolo_label, grids=grids, anchor_ratios=anchor_ratios, class_number=class_number))
-    training_dataset = tf.data.Dataset.zip((imgs_ds, label_ds))
-    return training_dataset
-
-
-def test_tf_dataset():
-    root_dir = '../test'
-    tf_dataset(root_dir)
-
-
-if __name__ == '__main__':
-    test_tf_dataset()
+        partial(tf_create_yolo_label, grids=grids, anchor_ratios=anchor_ratios, class_number=class_number), num_parallel_calls=4)
+    dataset = tf.data.Dataset.zip((imgs_ds, label_ds))
+    # slice all data. 70% for training, 30% for validation
+    training_dataset = dataset.take(int(len(dataset)*0.7)).prefetch(batch_size*10).shuffle(batch_size*10).batch(batch_size)
+    val_dataset = dataset.skip(int(len(dataset)*0.7)).prefetch(batch_size*10).batch(batch_size)
+    return training_dataset, val_dataset
