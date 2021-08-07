@@ -20,9 +20,10 @@ def get_args():
     return args
 
 
-def load_test_img(name):
+def load_test_img(name, shape):
     img = cv2.imread(name)
     src_img = img.copy()
+    img = cv2.resize(img, shape)
     img = img.astype(np.float32) / 255.0
     img = np.expand_dims(img, axis=0)
     return src_img, img
@@ -49,12 +50,12 @@ def draw_roi(img, scores, bboxes, name='qrcode'):
 
 def main():
     args = get_args()
-    model = yolov3(args.shape, anchor_number=6, weight=args.weight)
-    test_img = args.input
-    src_img, img = load_test_img(test_img)
-    pred = model.predict(img)[0]
     anchors = util.load_anchors('./anchors.json')
-    anchors = gen_anchors([8, 8], anchors)
+    model = yolov3(args.shape, anchor_number=len(anchors), weight=args.weight)
+    anchors = gen_anchors([s//32 for s in args.shape], anchors)
+    test_img = args.input
+    src_img, img = load_test_img(test_img, args.shape)
+    pred = model.predict(img)[0]
     scores, classes, bboxes = util.decode(anchors, pred)
     scores, bboxes = util.postprocess(scores, classes, bboxes)
     src_img = draw_roi(src_img, scores, bboxes)
