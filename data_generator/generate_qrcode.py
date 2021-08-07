@@ -18,9 +18,9 @@ def get_args():
     parser.add_argument('--number', '-n', type=int,
                         default=1000, help='How many qrcode images will be generated')
     parser.add_argument('--min_length', '-min', type=int,
-                        default=10, help='min length of the string')
+                        default=10, help='min length of the string encoded in qrcode')
     parser.add_argument('--max_length', '-max', type=int,
-                        default=25, help='max length of the string')
+                        default=25, help='max length of the string encoded in qrcode')
     parser.add_argument('--output_dir', '-o', type=str, required=True,
                         help='Dir to save the result')
     parser.add_argument('--size', '-s', type=int, default=6,
