@@ -1,6 +1,7 @@
 import numpy as np
 
 
+ANCHOR = None
 def restack_anchors(xs, ys, ws, hs):
     xs = np.split(xs, xs.shape[2], axis=2)
     ys = np.split(ys, ys.shape[2], axis=2)
@@ -19,6 +20,9 @@ def gen_anchors(grids, anchor_ratios):
     :param anchor_ratios: np.ndarray. [[anchor_w, anchor_h]*]
     :return: priori anchors
     """
+    global ANCHOR
+    if ANCHOR is not None:
+        return ANCHOR
     grid_w, grid_h = grids
     ys, xs = np.meshgrid(list(range(grid_w)), list(range(grid_h)))
     xs = xs * (1 / grid_w) + (1 / grid_w) * 0.5
@@ -33,6 +37,7 @@ def gen_anchors(grids, anchor_ratios):
     ys = np.expand_dims(ys, axis=[2, 3])
     ys = np.tile(ys, [1, 1, anchor_per_grid, 1])
     anchors = restack_anchors(xs, ys, ws, hs)
+    ANCHOR = anchors.astype(np.float32)
     return anchors.astype(np.float32)
 
 
@@ -51,6 +56,8 @@ def test_generated_anchors():
             anchors[i, j, 1, :] = np.array([i * 0.25 + 0.125, j * 0.25 + 0.125, 2, 2])
     assert np.allclose(generated_anchors, anchors)
 
+    global ANCHOR
+    ANCHOR = None
     grid = [5, 5]
     anchor_rations = np.array([[1, 1], [2, 2], [0.6, 0.8]])
     generated_anchors = gen_anchors(grid, anchor_rations)
