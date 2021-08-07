@@ -10,6 +10,31 @@ def load_anchors(anchor_file):
     return np.array(anchors)
 
 
+def general_iou(bbox1, bbox2):
+    xmin1, ymin1, xmax1, ymax1 = bbox1
+    xmin2, ymin2, xmax2, ymax2 = bbox2
+    left = np.max([xmin1, xmin2])
+    right = np.min([xmax1, xmax2])
+    top = np.max([ymin1, ymin2])
+    bottom = np.min([ymax1, ymax2])
+    iw = np.max([(right - left), 0])
+    ih = np.max([(bottom - top), 0])
+    si = iw * ih
+    s1 = (xmax1 - xmin1) * (ymax1 - ymin1)
+    s2 = (xmax2 - xmin2) * (ymax2 - ymin2)
+    _iou = si / (s1 + s2 - si)
+    return _iou
+
+
+def cxcy2xyxy(bbox):
+    cx, cy, w, h = bbox
+    xmin = cx - w / 2
+    ymin = cy - h / 2
+    xmax = xmin + w
+    ymax = ymin + h
+    return xmin, ymin, xmax, ymax
+
+
 def iou(bbox1, bbox2):
     """
     :param bbox1: np.ndarray. [gridw, gridh, anchor_per_grid, 4]
@@ -117,7 +142,7 @@ def bbox2yololabel(bboxs, grids, anchor_ratios, class_number=2):
     """
     channel = len(anchor_ratios) * (1 + class_number + 4)
     labels = np.zeros(shape=(grids[0], grids[1], len(anchor_ratios), channel // len(anchor_ratios)), dtype=np.float32)
-    labels[...,1] = np.array([1.0])
+    labels[..., 1] = np.array([1.0])
     anchors = gen_anchors(grids, anchor_ratios)
     ious = iou(anchors, bboxs)
     for i in range(ious.shape[0]):

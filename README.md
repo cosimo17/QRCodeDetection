@@ -6,8 +6,13 @@ Deep learning based QRCode detection.
 This is a project which depends on deep learning algorithm for QRCode detection.  
 We have achieved fast and high-precision detection by using a yolov3-like detecter.
 Feature:
-+ Fast detection
-+ High precision
++ Fast detection, more than 190 fps on GTX 1060.
++ High precision  
+  Evaluate result on validation data 
+  |Precision|Recall|Mean IOU|
+  |  ----  | ----  |----|
+  |0.987|0.819|0.798|  
+  
 + Free deployment
 
 ## Installation
@@ -32,7 +37,7 @@ python3 test.py \
 * Run the kmean algorithm to generate priori anchor boxes
 ```shell
 python3 utils/kmean.py \
-		--root_dir \
+		--root_dir your_dataset_dir \
 		-n 6
 ```
 
@@ -49,6 +54,17 @@ During training, you can use tensorboard to visualize the loss curve.
 tensorboard --logdir=./logs
 ```
 ![loss](assets/loss_curve.png)  
+
+## Evaluate
+Execute following command to evaluate the model performance:
+```shell
+python3 evaluate.py \
+	-d your_dataset_dir \
+	-b 64 \
+	--score_threshold 0.5 \
+	--iou_threshold 0.5 \
+	-w yolo_qrcode.h5
+```
 
 ## TODO
 - [ ] Integrate decode module  
