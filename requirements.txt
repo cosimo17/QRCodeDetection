@@ -1,0 +1,6 @@
+opencv-python
+qrcode
+imgaug
+tqdm
+numpy
+tensorflow-gpu
