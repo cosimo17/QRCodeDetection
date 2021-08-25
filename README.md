@@ -4,8 +4,10 @@ Deep learning based QRCode detection.
 
 ## Introduction
 This is a project which depends on deep learning algorithm for QRCode detection.  
-We have achieved fast and high-precision detection by using a yolov3-like detecter.
-Feature:
+We have achieved fast and high-precision detection by using a yolov3-like detecter.  
+
+Feature:  
+
 + Fast detection, more than 190 fps on GTX 1060.
 + High precision  
   Evaluate result on validation data 
