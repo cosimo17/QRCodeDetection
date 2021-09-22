@@ -31,7 +31,7 @@ python3 test.py \
 ```
 
 ## 训练
-* 训练自己的模型之前，请先查看[如何准备训练数据集]()  
+* 训练自己的模型之前，请先查看[如何准备训练数据集](data_generator/README_zh.md)  
 * 运行聚类算法，为数据集生成先验的锚点(anchor box)
 ```shell
 python3 utils/kmean.py \
