@@ -99,7 +99,7 @@ def sigmoid(x):
 
 def decode(anchors, output):
     """
-    decide anchor relative offset to bbox coordinate
+    decode anchor relative offset to bbox coordinate
     output: np.ndarray. output from network. [n, w, h, anchor_per_grid, 7]
     """
     scores, cls_conf, bbox = output[..., 0], output[..., 1:3], output[..., 3:]
