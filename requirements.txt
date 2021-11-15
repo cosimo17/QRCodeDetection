@@ -4,3 +4,4 @@ imgaug
 tqdm
 numpy
 tensorflow-gpu
+sklearn
