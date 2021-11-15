@@ -26,8 +26,8 @@ pip install -r requirements.txt
 ```shell
 python3 test.py \
 	-w yolo_qrcode.h5 \
-	-i test_images\1.jpg \
-	-o .\result_1.jpg
+	-i test_images/1.jpg \
+	-o ./result_1.jpg
 ```
 
 ## 训练
