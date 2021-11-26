@@ -12,7 +12,7 @@ def yolo_loss(y_true, y_pred):
     epsilon = 0.0001
     pred_cls = tf.clip_by_value(pred_cls, epsilon, 1 - epsilon)
     pred_xy = tf.math.tanh(y_pred[..., 3:5])
-    pred_wh = tf.math.exp(y_pred[..., 5:])
+    pred_wh = tf.math.tanh(y_pred[..., 5:])
 
     true_scores = y_true[..., 0]
     true_cls = y_true[..., 1:3]

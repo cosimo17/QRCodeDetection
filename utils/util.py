@@ -106,7 +106,7 @@ def decode(anchors, output):
     scores = sigmoid(scores)
     cls_conf = sigmoid(cls_conf)
     bbox[..., :2] = np.tanh(bbox[..., :2])  # xw
-    bbox[..., 2:] = np.exp(bbox[..., 2:])  # wh
+    bbox[..., 2:] = np.tanh(bbox[..., 2:])  # wh
     tx, ty, tw, th = np.split(bbox, 4, axis=-1)
     anchor_cx, anchor_cy, anchor_w, anchor_h = np.split(anchors, 4, axis=-1)
     cx = tx * anchor_w + anchor_cx
