@@ -11,7 +11,7 @@ MIN_H = 32
 aug_seq = iaa.Sequential([
     iaa.Crop(px=(0, 10)),
     iaa.GaussianBlur(sigma=(0.0, 4)),
-    iaa.AdditiveGaussianNoise(loc=0, scale=(0.0, 0.5 * 255), per_channel=0.5),
+    iaa.Sometimes(0.5, iaa.AdditiveGaussianNoise(loc=0, scale=(0.0, 0.5 * 255), per_channel=0.5)),
     iaa.Affine(
         scale={"x": (0.3, 0.5), "y": (0.3, 0.5)},
         rotate=(-25, 25),
@@ -90,7 +90,6 @@ def try_random_resize(fg_img, size_range):
         fg_img = _fg_img.copy()
         # augment
         fg_img = augment_process_fg(fg_img)
-        fg_img = random_resize(fg_img, size_range)
         mask = np.argwhere(fg_img > 0)
         box = (np.min(mask[..., 0]),
                np.min(mask[..., 1]),
@@ -99,13 +98,19 @@ def try_random_resize(fg_img, size_range):
         if box[2] - box[0] < MIN_W or box[3] - box[1] < MIN_H:
             continue
         fg_img = fg_img[box[0]:box[2], box[1]:box[3], ...]
+        fg_img = random_resize(fg_img, size_range)
+
         break
     return fg_img
 
 
 def try_random_position(fg_img, bg_size, exist_bbox):
     fg_size = [fg_img.shape[1], fg_img.shape[0]]
+    count = 0
+    max_count = 20
     while True:
+        if count > max_count:
+            return None
         bbox = random_position(bg_size, fg_size)
         intersection = False
         for bx in exist_bbox:
@@ -114,6 +119,7 @@ def try_random_position(fg_img, bg_size, exist_bbox):
                 break
         if not intersection:
             break
+        count += 1
     return bbox
 
 
@@ -195,7 +201,8 @@ def generate_training_data(args):
                 fg_img = fg_imgs[count]
                 fg_img = try_random_resize(fg_img, args.size)
                 bbox = try_random_position(fg_img, [bg_img.shape[1], bg_img.shape[0]], exist_bbox)
-
+                if bbox is None:
+                    continue
                 synth_img = paste(fg_img, bg_img, bbox, args.alpha)
                 exist_bbox.append(bbox)
                 l, t, w, h = normalize_coordinate(bbox, bg_img.shape)
