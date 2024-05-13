@@ -2,6 +2,7 @@ import numpy as np
 from .anchor_generator import gen_anchors
 import json
 import tensorflow as tf
+np.seterr(divide='raise')
 
 
 def load_anchors(anchor_file):
